@@ -45,12 +45,31 @@ public class GraphPanel extends JPanel {
 
                 // Transform density to color (the higher the density, the darker the color)
                 int intensity = (int) (255 * Math.min(density * 10, 1.0));
-                g2d.setColor(new Color(255-intensity, intensity,intensity));
+
+                // Calculate the color components based on intensity
+                int red = 255 - intensity;
+                int green = 0;
+                int blue = 0;
+
+                // When intensity is maximum, color should be black
+                if (intensity == 255) {
+                    red = 0;
+                    green = 0;
+                    blue = 0;
+                }
+
+                // Set the color with the calculated components
+                g2d.setColor(new Color(red, green, blue));
 
                 // Transform coordinates from mathematical system to pixels
                 int pixelX = (int) ((x - xMin) / (xMax - xMin) * width);
                 int pixelY = (int) ((yMax - y) / (yMax - yMin) * height);
-                g2d.fill(new Rectangle2D.Double(pixelX, pixelY, width / resolution + 1, height / resolution + 1));
+                g2d.fill(new Rectangle2D.Double(
+                        pixelX,
+                        pixelY,
+                        (double) width / resolution + 1,
+                        (double) height / resolution + 1)
+                );
             }
         }
     }

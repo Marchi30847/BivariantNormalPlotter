@@ -43,4 +43,24 @@ public class Controller {
     public double getDensity() {
         return density;
     }
+
+    public double getMeanA() {
+        return meanA;
+    }
+
+    public double getMeanB() {
+        return meanB;
+    }
+
+    public double getStdDevA() {
+        return stdDevA;
+    }
+
+    public double getStdDevB() {
+        return stdDevB;
+    }
+
+    public double getCorrelation() {
+        return correlation;
+    }
 }

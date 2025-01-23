@@ -106,11 +106,6 @@ public class InputPanel extends JPanel {
                             Double.parseDouble(corr.getText().trim())
                     );
                 } catch (NumberFormatException exception) {
-                    System.out.println(Double.parseDouble(meanA.getText().trim()));
-                    System.out.println(Double.parseDouble(meanB.getText().trim()));
-                    System.out.println(Double.parseDouble(stdA.getText().trim()));
-                    System.out.println(Double.parseDouble(stdB.getText().trim()));
-                    System.out.println(Double.parseDouble(corr.getText().trim()));
                     System.out.println("Invalid input");
                 }
             }
