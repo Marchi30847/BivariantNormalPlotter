@@ -1,65 +1,121 @@
-import java.util.Scanner;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+import javax.swing.*;
 
 public class BivariateNormalConditionalProbability {
 
 	public static void main(String[] args) {
-		Scanner scanner = new Scanner(System.in);
+		// Input parameters
+		double meanX = 0, meanY = 0, sigmaX = 1, sigmaY = 1, rho = 0.5;
+		double a = 0.5, b = 0.5;
 
-		// Input for distribution parameters
-		System.out.print("Enter mean of X: ");
-		double meanX = scanner.nextDouble();
-		System.out.print("Enter mean of Y: ");
-		double meanY = scanner.nextDouble();
-		System.out.print("Enter standard deviation of X: ");
-		double sigmaX = scanner.nextDouble();
-		System.out.print("Enter standard deviation of Y: ");
-		double sigmaY = scanner.nextDouble();
-		System.out.print("Enter correlation coefficient: ");
-		double rho = scanner.nextDouble();
+		double conditionalProbability = computeConditionalProbability(a, b, meanX, meanY, sigmaX, sigmaY, rho);
+		System.out.printf("P(X > %.2f | Y > %.2f) = %.5f%n", a, b, conditionalProbability);
 
-		// Input for probability thresholds
-		System.out.print("Enter threshold value for X (a): ");
-		double a = scanner.nextDouble();
-		System.out.print("Enter threshold value for Y (b): ");
-		double b = scanner.nextDouble();
-
-		double result = computeConditionalProbability(meanX, meanY, sigmaX, sigmaY, rho, a, b);
-
-		System.out.printf("P(X > %.2f | Y > %.2f) = %.4f%n", a, b, result);
-
-		scanner.close();
+		// Launch the graph plotting in Swing
+		SwingUtilities.invokeLater(() -> {
+			JFrame frame = new JFrame("Bivariate Conditional Probability Plot");
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.add(createChartPanel(meanX, meanY, sigmaX, sigmaY, rho));
+			frame.pack();
+			frame.setVisible(true);
+		});
 	}
 
-	// Compute P(X > a | Y > b) using numerical integration
-	private static double computeConditionalProbability(double meanX, double meanY, double sigmaX, double sigmaY, double rho, double a, double b) {
-		double integralX = 0.0;
-		double integralY = 0.0;
-		double stepSize = 0.01;
-		double upperBound = 5;  // Assuming most of the probability mass is within +/- 5 standard deviations
+	public static JPanel createChartPanel(double meanX, double meanY, double sigmaX, double sigmaY, double rho) {
+		// Create a series for the graph
+		XYSeries series = new XYSeries("F(x, y) with fixed y=0.5");
+		double y = 0.5;
 
-		for (double y = b; y < upperBound; y += stepSize) {
-			for (double x = a; x < upperBound; x += stepSize) {
-				double pdf = pdfBivariateNormal(x, y, meanX, meanY, sigmaX, sigmaY, rho);
-				integralX += pdf * stepSize;
-			}
-			double pdfY = pdfNormal((y - meanY) / sigmaY);
-			integralY += pdfY * stepSize;
+		for (double x = -3.0; x <= 3.0; x += 0.1) {
+			double probability = computeConditionalProbability(x, y, meanX, meanY, sigmaX, sigmaY, rho);
+			series.add(x, probability);
 		}
 
-		return integralY > 0 ? (integralX / integralY) : 0;
+		// Create a dataset from the series
+		XYSeriesCollection dataset = new XYSeriesCollection(series);
+
+		// Create the chart
+		JFreeChart chart = ChartFactory.createXYLineChart(
+				"Bivariate Conditional Probability",  // Title
+				"X",                                // X-axis Label
+				"F(X, Y)",                          // Y-axis Label
+				dataset,                            // Dataset
+				PlotOrientation.VERTICAL,           // Plot orientation
+				true,                               // Include legend
+				true,                               // Tooltips
+				false                               // URLs
+		);
+
+		// Create a panel to display the chart
+		return new ChartPanel(chart);
 	}
 
-	// Probability Density Function for bivariate normal distribution
-	private static double pdfBivariateNormal(double x, double y, double muX, double muY, double sigmaX, double sigmaY, double rho) {
-		double z = ((x - muX) * (x - muX)) / (sigmaX * sigmaX) -
-				(2 * rho * (x - muX) * (y - muY)) / (sigmaX * sigmaY) +
-				((y - muY) * (y - muY)) / (sigmaY * sigmaY);
-		double norm = 1 / (2 * Math.PI * sigmaX * sigmaY * Math.sqrt(1 - rho * rho));
-		return norm * Math.exp(-z / (2 * (1 - rho * rho)));
+	public static double computeConditionalProbability(double a, double b,
+	                                                   double meanX, double meanY,
+	                                                   double sigmaX, double sigmaY,
+	                                                   double rho) {
+		double jointProbability = computeJointProbability(a, b, meanX, meanY, sigmaX, sigmaY, rho);
+		double marginalProbabilityY = computeMarginalProbabilityY(b, meanY, sigmaY);
+		return marginalProbabilityY < 1e-10 ? 0.0 : jointProbability / marginalProbabilityY;
 	}
 
-	// Probability Density Function for normal distribution
-	private static double pdfNormal(double z) {
-		return (1 / Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * z * z);
+	private static double computeJointProbability(double a, double b,
+	                                              double meanX, double meanY,
+	                                              double sigmaX, double sigmaY,
+	                                              double rho) {
+		int stepsX = 100, stepsY = 100;
+		double lowerX = a, upperX = 6, lowerY = b, upperY = 6;
+		double dx = (upperX - lowerX) / stepsX;
+		double dy = (upperY - lowerY) / stepsY;
+
+		double sum = 0.0;
+		for (int i = 0; i <= stepsX; i++) {
+			for (int j = 0; j <= stepsY; j++) {
+				double x = lowerX + i * dx;
+				double y = lowerY + j * dy;
+				double weightX = (i == 0 || i == stepsX) ? 1 : (i % 2 == 0 ? 2 : 4);
+				double weightY = (j == 0 || j == stepsY) ? 1 : (j % 2 == 0 ? 2 : 4);
+				sum += weightX * weightY * bivariateNormalPDF(x, y, meanX, meanY, sigmaX, sigmaY, rho);
+			}
+		}
+		return sum * dx * dy / 9.0;
+	}
+
+	private static double computeMarginalProbabilityY(double b, double mean, double sigma) {
+		double z = (b - mean) / sigma;
+		return 1 - cumulativeStandardNormal(z);
+	}
+
+	private static double bivariateNormalPDF(double x, double y, double meanX, double meanY, double sigmaX, double sigmaY, double rho) {
+		double z = ((x - meanX) / sigmaX) * ((x - meanX) / sigmaX)
+				- 2 * rho * ((x - meanX) / sigmaX) * ((y - meanY) / sigmaY)
+				+ ((y - meanY) / sigmaY) * ((y - meanY) / sigmaY);
+		return Math.exp(-z / (2 * (1 - rho * rho)))
+				/ (2 * Math.PI * sigmaX * sigmaY * Math.sqrt(1 - rho * rho));
+	}
+
+	public static double cumulativeStandardNormal(double z) {
+		if (z < -6.0) return 0.0;
+		if (z > 6.0) return 1.0;
+
+		int steps = 10000;
+		double stepSize = z / steps;
+		double sum = 0.0;
+
+		for (int i = 0; i <= steps; i++) {
+			double x = i * stepSize;
+			double weight = (i == 0 || i == steps) ? 1 : (i % 2 == 0 ? 2 : 4);
+			sum += weight * standardNormalPDF(x);
+		}
+		return (sum * stepSize / 3.0) + 0.5;
+	}
+
+	public static double standardNormalPDF(double x) {
+		return Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
 	}
 }
