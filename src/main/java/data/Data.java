@@ -2,8 +2,8 @@ package data;
 
 public enum Data {
 
-    ICON("java/resources/images/appIcon.png"),
-    FONT("java/resources/fonts/Montserrat-Bold.ttf");
+    ICON("src/resources/images/appIcon.png"),
+    FONT("src/resources/fonts/Montserrat-Bold.ttf");
 
     private final String path;
 

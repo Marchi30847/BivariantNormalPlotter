@@ -1,19 +1,24 @@
 package ui;
 
 import domain.SettingsSetter;
+import ui.graph.GraphPanel;
+import ui.input.InputPanel;
+import ui.input.InputPanelCallback;
 
 import javax.swing.*;
 import java.awt.*;
 
 
-public class View extends JFrame {
-
+public class View extends JFrame implements InputPanelCallback {
+    private final GraphPanel graphPanel = new GraphPanel();
+    private final InputPanel inputPanel = new InputPanel(this);
     private static final Dimension frameSize = new Dimension(800, 800);
     {new SettingsSetter(this);}
 
-    public void show() {
+    public void openMainJFrame() {
         configure();
         openMenu();
+
         SettingsSetter.setParametersToObjects(this);
     }
 
@@ -27,6 +32,12 @@ public class View extends JFrame {
     }
 
     private void openMenu() {
+        add(graphPanel, BorderLayout.CENTER);
+        add(inputPanel, BorderLayout.SOUTH);
+    }
+
+    @Override
+    public void onChangesApplied(double meanA, double meanB, double stdA, double stdB, double corr) {
 
     }
 }

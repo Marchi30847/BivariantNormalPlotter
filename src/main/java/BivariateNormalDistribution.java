@@ -25,7 +25,7 @@ public class BivariateNormalDistribution extends JPanel {
         double yMin = -3.0, yMax = 3.0;
 
         // Разрешение сетки
-        int resolution = 200;
+        int resolution = 1800;
         double stepX = (xMax - xMin) / resolution;
         double stepY = (yMax - yMin) / resolution;
 
@@ -35,6 +35,7 @@ public class BivariateNormalDistribution extends JPanel {
                 double x = xMin + i * stepX;
                 double y = yMin + j * stepY;
                 double density = bivariateNormalDensity(x, y);
+                System.out.println(density);
 
                 // Преобразуем плотность в цвет (чем выше, тем темнее)
                 int intensity = (int) (255 * Math.min(density * 10, 1.0));

@@ -15,8 +15,8 @@ public class SettingsSetter {
 
         try {
             window.setIconImage(new ImageIcon(Data.ICON.getPath()).getImage());
-//            font = Font.createFont(Font.TRUETYPE_FONT,
-//                    new java.io.File(Data.FONT.getPath()));
+            font = Font.createFont(Font.TRUETYPE_FONT,
+                    new java.io.File(Data.FONT.getPath()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -25,7 +25,7 @@ public class SettingsSetter {
     public static void setParametersToObjects(Component component) {
         if (!ignoredComponents.contains(component)) {
             if (!(component.getFont() == null)) {
-                //component.setFont(font.deriveFont((float) component.getFont().getSize()));
+                component.setFont(font.deriveFont((float) component.getFont().getSize()));
             }
             component.setVisible(true);
         }
