@@ -1,19 +1,24 @@
-//Hello guys
-
-import javax.swing.*;
+import domain.BivariantNormalCalculator;
+import javafx.application.Application;
+import ui.BivariantNormal3DPlotter;
+import ui.BivariantNormalPlotter;
 
 public class Main {
     public static void main(String[] args) {
-        BivariateNormalDistribution dist = new BivariateNormalDistribution(0, 0, 1, 1, 0.5);
-        double a = 1.0;
-        double b = 1.0;
+        // Input parameters
+        double meanX = 0.0;   // Mean of X
+        double meanY = 0.0;   // Mean of Y
+        double stdX = 1.0;    // Standard deviation of X
+        double stdY = 1.0;    // Standard deviation of Y
+        double correlation = 0.5; // Correlation coefficient
+        double a = 1.0;       // Value for a
+        double b = 1.0;       // Value for b
 
-        JFrame frame = new JFrame("Bivariate Normal Distribution Plot");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 800);
-        frame.setLocationRelativeTo(null);   // center the window
-        GraphPlotter plotter = new GraphPlotter(dist, a, b);
-        frame.add(plotter);
-        frame.setVisible(true);
+        // Calculate P(X > a | Y > b)
+        double probability = BivariantNormalCalculator.computeConditionalProbability(meanX, meanY, stdX, stdY, correlation, a, b);
+        System.out.println("P(X > " + a + " | Y > " + b + ") = " + probability);
+
+        // Plot the function F(x, y) = P(X > x | Y > y)
+        BivariantNormalPlotter.plotFunction(meanX, meanY, stdX, stdY, correlation);
     }
 }
