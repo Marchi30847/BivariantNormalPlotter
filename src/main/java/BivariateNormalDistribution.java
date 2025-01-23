@@ -38,12 +38,13 @@ public class BivariateNormalDistribution extends JPanel {
 
                 // Преобразуем плотность в цвет (чем выше, тем темнее)
                 int intensity = (int) (255 * Math.min(density * 10, 1.0));
-                g2d.setColor(new Color(intensity, intensity, 255 - intensity));
+                g2d.setColor(new Color(255-intensity, intensity,intensity));
 
                 // Преобразуем координаты из математической системы в пиксели
                 int pixelX = (int) ((x - xMin) / (xMax - xMin) * width);
                 int pixelY = (int) ((yMax - y) / (yMax - yMin) * height);
-                g2d.fill(new Rectangle2D.Double(pixelX, pixelY, width / resolution, height / resolution));
+                g2d.fill(new Rectangle2D.Double(pixelX, pixelY, width / resolution + 1, height / resolution + 1));
+
             }
         }
     }
