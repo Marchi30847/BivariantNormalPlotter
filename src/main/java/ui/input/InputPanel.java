@@ -38,6 +38,7 @@ public class InputPanel extends JPanel {
         constraints.gridx = 1;
         constraints.gridy = 0;
         meanAndDeviationPanel.add(meanA, constraints);
+        meanA.setText("0.0");
 
         JLabel meanBLable = new JLabel("μB");
         SettingsSetter.ignoreSettingParametersToObjects(meanBLable);
@@ -47,6 +48,7 @@ public class InputPanel extends JPanel {
         constraints.gridx = 3;
         constraints.gridy = 0;
         meanAndDeviationPanel.add(meanB, constraints);
+        meanB.setText("0.0");
 
         JLabel stdALable = new JLabel("σA");
         SettingsSetter.ignoreSettingParametersToObjects(stdALable);
@@ -58,6 +60,7 @@ public class InputPanel extends JPanel {
         constraints.gridy = 1;
         constraints.gridheight = 2;
         meanAndDeviationPanel.add(stdA, constraints);
+        stdA.setText("1.0");
 
         constraints.gridheight = 1;
         JLabel stdBLable = new JLabel("σB");
@@ -68,6 +71,7 @@ public class InputPanel extends JPanel {
         constraints.gridx = 3;
         constraints.gridy = 1;
         meanAndDeviationPanel.add(stdB, constraints);
+        stdB.setText("1.0");
 
         add(meanAndDeviationPanel, BorderLayout.NORTH);
 
@@ -82,6 +86,7 @@ public class InputPanel extends JPanel {
         constraints.gridx = 5;
         constraints.gridy = 0;
         correlationPanel.add(corr, constraints);
+        corr.setText("0.5");
 
         add(correlationPanel, BorderLayout.SOUTH);
     }
@@ -90,7 +95,7 @@ public class InputPanel extends JPanel {
 
         KeyAdapter onUpdateKeyAdapter = new KeyAdapter() {
             @Override
-            public void keyTyped(KeyEvent e) {
+            public void keyReleased(KeyEvent e) {
                 super.keyTyped(e);
                 try {
                     inputPanelCallback.onChangesApplied(
@@ -101,6 +106,11 @@ public class InputPanel extends JPanel {
                             Double.parseDouble(corr.getText().trim())
                     );
                 } catch (NumberFormatException exception) {
+                    System.out.println(Double.parseDouble(meanA.getText().trim()));
+                    System.out.println(Double.parseDouble(meanB.getText().trim()));
+                    System.out.println(Double.parseDouble(stdA.getText().trim()));
+                    System.out.println(Double.parseDouble(stdB.getText().trim()));
+                    System.out.println(Double.parseDouble(corr.getText().trim()));
                     System.out.println("Invalid input");
                 }
             }

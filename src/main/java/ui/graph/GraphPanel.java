@@ -5,9 +5,13 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 public class GraphPanel extends JPanel {
-    private double density = 0.0;
-    public GraphPanel() {
+    private final GraphPanelCallback callback;
+
+    public GraphPanel(GraphPanelCallback callback) {
         super();
+
+        this.callback = callback;
+
         configure();
     }
 
@@ -37,6 +41,7 @@ public class GraphPanel extends JPanel {
             for (int j = 0; j < resolution; j++) {
                 double x = xMin + i * stepX;
                 double y = yMin + j * stepY;
+                double density = callback.getNewDensity(x, y);
 
                 // Transform density to color (the higher the density, the darker the color)
                 int intensity = (int) (255 * Math.min(density * 10, 1.0));

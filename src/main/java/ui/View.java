@@ -1,7 +1,10 @@
 package ui;
 
+import domain.Presenter;
+import domain.PresenterContract;
 import domain.SettingsSetter;
 import ui.graph.GraphPanel;
+import ui.graph.GraphPanelCallback;
 import ui.input.InputPanel;
 import ui.input.InputPanelCallback;
 
@@ -9,8 +12,9 @@ import javax.swing.*;
 import java.awt.*;
 
 
-public class View extends JFrame implements InputPanelCallback {
-    private final GraphPanel graphPanel = new GraphPanel();
+public class View extends JFrame implements InputPanelCallback, GraphPanelCallback {
+    private final PresenterContract presenterContract = new Presenter();
+    private final GraphPanel graphPanel = new GraphPanel(this);
     private final InputPanel inputPanel = new InputPanel(this);
     private static final Dimension frameSize = new Dimension(800, 800);
     {new SettingsSetter(this);}
@@ -38,6 +42,12 @@ public class View extends JFrame implements InputPanelCallback {
 
     @Override
     public void onChangesApplied(double meanA, double meanB, double stdA, double stdB, double corr) {
+        presenterContract.updateGraph(meanA, meanB, stdA, stdB, corr);
+        graphPanel.repaint();
+    }
 
+    @Override
+    public double getNewDensity(double x, double y) {
+        return presenterContract.getNewDensity(x, y);
     }
 }
