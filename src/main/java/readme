@@ -1,0 +1,15 @@
+Your task is to write a program (Java)
+that takes as an input:
+
+- the distribution of a bi-variate normal random variable (X, Y) --
+i.e. it takes the means, standard deviations of X and Y, and the
+correlation between X and Y
+
+- real (float) numbers a and b
+
+plots the graph of the function:
+
+F(x, y) = P(X > x | Y > y)
+
+and outputs the probability F(a, b) = P(X > a | Y > b). HINT: you
+might want to use numerical integration.
