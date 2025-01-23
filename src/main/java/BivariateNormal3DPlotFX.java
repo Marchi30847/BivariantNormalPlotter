@@ -35,7 +35,6 @@ public class BivariateNormal3DPlotFX extends Application {
 				cylinder.setTranslateY(b * 50); // Scaling for visual spacing
 				cylinder.setTranslateZ(height / 2); // Position in Z direction based on height
 
-				// Set color based on probability for visual effect
 				if (prob > 0.5) {
 					cylinder.setMaterial(new javafx.scene.paint.PhongMaterial(Color.GREEN));
 				} else {
