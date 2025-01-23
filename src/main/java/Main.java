@@ -9,11 +9,11 @@ public class Main {
         double b = 1.0;
 
         JFrame frame = new JFrame("Bivariate Normal Distribution Plot");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 800);
         frame.setLocationRelativeTo(null);   // center the window
         GraphPlotter plotter = new GraphPlotter(dist, a, b);
         frame.add(plotter);
-        frame.setSize(800, 800);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
 }
