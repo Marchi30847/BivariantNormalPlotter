@@ -13,3 +13,7 @@ F(x, y) = P(X > x | Y > y)
 
 and outputs the probability F(a, b) = P(X > a | Y > b). HINT: you
 might want to use numerical integration.
+
+CHECK CORRECTNESS
+i found site where it is possible to check result
+https://socr.umich.edu/HTML5/BivariateNormal/
