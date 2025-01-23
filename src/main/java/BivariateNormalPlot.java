@@ -4,58 +4,86 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.axis.NumberAxis;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class BivariateNormalPlot {
 
-	public static void main(String[] args) {
-		// Input parameters
-		double meanX = 0, meanY = 0, sigmaX = 1, sigmaY = 1, rho = 0.5;
-		double a = 0.5, b = 0.5;
+	// Method to create a 3D plot for the conditional probability P(X > a | Y > b)
+	public static void plot3DConditionalProbability(double meanX, double meanY,
+	                                                double sigmaX, double sigmaY,
+	                                                double rho, double aMin, double aMax,
+	                                                double bMin, double bMax, int resolution) {
 
-		// Compute the conditional probability for X > a | Y > b
-		double conditionalProbability = BivariateNormalLogic.computeConditionalProbability(a, b, meanX, meanY, sigmaX, sigmaY, rho);
-		System.out.printf("P(X > %.2f | Y > %.2f) = %.5f%n", a, b, conditionalProbability);
+		// Data Series to hold the 3D surface data
+		XYSeriesCollection dataset = new XYSeriesCollection();
+		XYSeries series = new XYSeries("P(X > a | Y > b)");
 
-		// Launch the graph plotting in Swing
-		SwingUtilities.invokeLater(() -> {
-			JFrame frame = new JFrame("Bivariate Conditional Probability Plot");
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			frame.add(createChartPanel(meanX, meanY, sigmaX, sigmaY, rho));
-			frame.pack();
-			frame.setVisible(true);
-		});
-	}
+		// Loop through the range of a and b values
+		for (int i = 0; i < resolution; i++) {
+			for (int j = 0; j < resolution; j++) {
+				double a = aMin + (aMax - aMin) * i / (resolution - 1);
+				double b = bMin + (bMax - bMin) * j / (resolution - 1);
 
-	// Create chart panel
-	public static JPanel createChartPanel(double meanX, double meanY, double sigmaX, double sigmaY, double rho) {
-		// Create a series for the graph
-		XYSeries series = new XYSeries("F(x, y) with fixed y=0.5");
-		double y = 0.5;
+				// Compute the conditional probability using the provided method
+				double prob = BivariateNormalLogic.computeConditionalProbability(a, b, meanX, meanY, sigmaX, sigmaY, rho);
 
-		// Compute the conditional probability for X in the range [-3, 3]
-		for (double x = -3.0; x <= 3.0; x += 0.1) {
-			double probability = BivariateNormalLogic.computeConditionalProbability(x, y, meanX, meanY, sigmaX, sigmaY, rho);
-			series.add(x, probability);
+				// Add data to the series
+				series.add(a, prob); // (a, P(X > a | Y > b))
+			}
 		}
 
-		// Create a dataset from the series
-		XYSeriesCollection dataset = new XYSeriesCollection(series);
+		// Add series to the dataset
+		dataset.addSeries(series);
 
-		// Create the chart
+		// Create the chart based on the dataset
 		JFreeChart chart = ChartFactory.createXYLineChart(
-				"Bivariate Conditional Probability",  // Title
-				"X",                                // X-axis Label
-				"F(X, Y)",                          // Y-axis Label
-				dataset,                            // Dataset
-				PlotOrientation.VERTICAL,           // Plot orientation
-				true,                               // Include legend
-				true,                               // Tooltips
-				false                               // URLs
+				"Conditional Probability P(X > a | Y > b)",  // Title
+				"a (X-axis)",   // X-axis Label
+				"P(X > a | Y > b)", // Y-axis Label
+				dataset,         // Dataset
+				PlotOrientation.VERTICAL,  // Plot orientation
+				true,            // Include legend
+				true,            // Tooltips
+				false            // URLs
 		);
 
-		// Return the chart panel for displaying
-		return new ChartPanel(chart);
+		// Customize the plot with a renderer for better visualization
+		XYPlot plot = chart.getXYPlot();
+		plot.setDomainPannable(true);
+		plot.setRangePannable(true);
+
+		// Axis customization
+		NumberAxis xAxis = (NumberAxis) plot.getDomainAxis();
+		xAxis.setLabel("a (X-axis)");
+		xAxis.setAutoRange(true);
+		xAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+
+		NumberAxis yAxis = (NumberAxis) plot.getRangeAxis();
+		yAxis.setLabel("P(X > a | Y > b)");
+		yAxis.setAutoRangeIncludesZero(false);
+
+		// Set up chart display in a JFrame
+		ChartPanel chartPanel = new ChartPanel(chart);
+		chartPanel.setPreferredSize(new java.awt.Dimension(800, 600));
+		JFrame frame = new JFrame("3D Conditional Probability Plot");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().add(chartPanel, BorderLayout.CENTER);
+		frame.pack();
+		frame.setVisible(true);
+	}
+
+	public static void main(String[] args) {
+		// Parameters for the bivariate normal distribution
+		double meanX = 0.0, meanY = 0.0, sigmaX = 1.0, sigmaY = 1.0, rho = 0.5;
+		double aMin = -3.0, aMax = 3.0, bMin = -3.0, bMax = 3.0;
+		int resolution = 100;
+
+		// Plot the conditional probability in 3D
+		plot3DConditionalProbability(meanX, meanY, sigmaX, sigmaY, rho, aMin, aMax, bMin, bMax, resolution);
 	}
 }
