@@ -161,7 +161,9 @@ public class BivariateNormalGUI {
 			for (int j = 0; j < yCount; j++) {
 				xValues[index] = xStart + i * dx;
 				yValues[index] = yStart + j * dy;
-				zValues[index] = data[i][j];
+
+				// Clamp values to valid range (avoid NaN/Infinity)
+				zValues[index] = Double.isNaN(data[i][j]) || data[i][j] < 0 ? 0 : Math.min(data[i][j], 1.0);
 				index++;
 			}
 		}
@@ -191,4 +193,5 @@ public class BivariateNormalGUI {
 
 		return chart;
 	}
+
 }

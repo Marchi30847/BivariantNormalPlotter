@@ -7,8 +7,15 @@ public class BivariateNormalLogic {
 	                                                   double rho) {
 		double jointProbability = computeJointProbability(a, b, meanX, meanY, sigmaX, sigmaY, rho);
 		double marginalProbabilityY = computeMarginalProbabilityY(b, meanY, sigmaY);
-		return marginalProbabilityY < 1e-10 ? 0.0 : jointProbability / marginalProbabilityY;
+
+		// Handle division by near-zero marginal probabilities
+		if (marginalProbabilityY < 1e-10 || Double.isNaN(jointProbability) || Double.isNaN(marginalProbabilityY)) {
+			return 0.0;
+		}
+
+		return jointProbability / marginalProbabilityY;
 	}
+
 
 	// Compute joint probability P(X > a, Y > b)
 	public static double computeJointProbability(double a, double b,
