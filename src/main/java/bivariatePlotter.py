@@ -1,7 +1,4 @@
 import numpy as np
-
-from scipy.integrate import dblquad
-
 import matplotlib.pyplot as plt
 import sys
 import math
@@ -90,6 +87,9 @@ def P_X_greater_a_Y_greater_b(a, b, steps=200, range_factor=5.0):
             y_val = y_grid[j]
             total += pdfBivariateNormalDist(x_val, y_val) * dx * dy
 
+    if total >= 1.0:
+        return 1.0
+
     return total
 
 def P_Y_greater_b(b, steps=200, range_factor=5.0):
@@ -123,9 +123,12 @@ def P_Y_greater_b(b, steps=200, range_factor=5.0):
             y_val = y_grid[j]
             total += pdfBivariateNormalDist(x_val, y_val) * dx * dy
 
+    if total >= 1.0:
+        return 1.0
+
     return total
 
-def conditional_P_X_greater_a_given_Y_greater_b(a, b, steps=200, range_factor=5.0):
+def conditional_P_X_greater_a_given_Y_greater_b(a, b, steps=50, range_factor=5.0):
     """
     Calculates P(X > a | Y > b) = P(X > a, Y > b) / P(Y > b)
     using simple numerical approximation with two nested loops.
@@ -135,29 +138,34 @@ def conditional_P_X_greater_a_given_Y_greater_b(a, b, steps=200, range_factor=5.
 
     if denominator == 0:
         return float('nan')
-    return numerator / denominator
+    value = numerator / denominator
+    if value >= 1.0:
+        return 1.0
+    return value
 
 prob = conditional_P_X_greater_a_given_Y_greater_b(a_input, b_input)
 print("P( X > a | Y > b ) = P( X >", a_input, "| Y >", b_input, ") =", prob)
 
 # Generate x and y values
-x = np.linspace(-5, 5, 100)
-y = np.linspace(-5, 5, 100)
+x = np.linspace(x_mean-5, x_mean+5, 20)
+y = np.linspace(y_mean-5, y_mean+5, 20)
 x, y = np.meshgrid(x, y)  # Create a 2D grid
 
 # Compute z values
-vectorized_function = np.vectorize(pdfBivariateNormalDist)
+vectorized_function = np.vectorize(conditional_P_X_greater_a_given_Y_greater_b)
+#vectorized_function = np.vectorize(pdfBivariateNormalDist)
 z = vectorized_function(x, y)
+#z = conditional_P_X_greater_a_given_Y_greater_b(x, y)
 
 # Create the color plot
 plt.figure(figsize=(8, 6))
-contour = plt.contourf(x, y, z, levels=50, cmap='viridis')  # Filled contours
+contour = plt.contourf(x, y, z, levels=50, cmap='viridis', vmin=0.0, vmax=1.0)  # Filled contours
 
 # Add a color bar
-plt.colorbar(contour, label='pdfBivariateNormalDist(x, y)')
+plt.colorbar(contour, label='P( X > x | Y > y )')
 
 # Add labels and title
-plt.title("Plot of bivariate normal distribution")
+plt.title("Plot of P( X > x | Y > y )")
 plt.xlabel("X")
 plt.ylabel("Y")
 
