@@ -1,3 +1,5 @@
+package deep;
+
 public class BivariateNormalLogic {
 
 	// Compute conditional probability P(X > a | Y > b)
