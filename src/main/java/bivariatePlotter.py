@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import sys
 import math
 
@@ -147,27 +148,29 @@ prob = conditional_P_X_greater_a_given_Y_greater_b(a_input, b_input)
 print("P( X > a | Y > b ) = P( X >", a_input, "| Y >", b_input, ") =", prob)
 
 # Generate x and y values
-x = np.linspace(x_mean-5, x_mean+5, 20)
-y = np.linspace(y_mean-5, y_mean+5, 20)
+x = np.linspace(x_mean - 5, x_mean + 5, 20)
+y = np.linspace(y_mean - 5, y_mean + 5, 20)
 x, y = np.meshgrid(x, y)  # Create a 2D grid
 
 # Compute z values
 vectorized_function = np.vectorize(conditional_P_X_greater_a_given_Y_greater_b)
-#vectorized_function = np.vectorize(pdfBivariateNormalDist)
 z = vectorized_function(x, y)
-#z = conditional_P_X_greater_a_given_Y_greater_b(x, y)
 
-# Create the color plot
-plt.figure(figsize=(8, 6))
-contour = plt.contourf(x, y, z, levels=50, cmap='viridis', vmin=0.0, vmax=1.0)  # Filled contours
+# Create a 3D plot
+fig = plt.figure(figsize=(10, 8))
+ax = fig.add_subplot(111, projection='3d')
+
+# Plot the surface
+surface = ax.plot_surface(x, y, z, cmap='viridis', edgecolor='k', linewidth=0.5, antialiased=True)
 
 # Add a color bar
-plt.colorbar(contour, label='P( X > x | Y > y )')
+fig.colorbar(surface, ax=ax, shrink=0.5, aspect=10, label='P( X > x | Y > y )')
 
 # Add labels and title
-plt.title("Plot of P( X > x | Y > y )")
-plt.xlabel("X")
-plt.ylabel("Y")
+ax.set_title("3D Plot of P( X > x | Y > y )")
+ax.set_xlabel("X")
+ax.set_ylabel("Y")
+ax.set_zlabel("Probability")
 
 # Show the plot
 plt.show()
