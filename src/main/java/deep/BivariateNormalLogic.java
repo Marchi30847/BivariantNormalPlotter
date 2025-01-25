@@ -25,7 +25,7 @@ public class BivariateNormalLogic {
 	                                             double sigmaX, double sigmaY,
 	                                             double rho) {
 		int stepsX = 100, stepsY = 100;
-		double lowerX = a, upperX = 6, lowerY = b, upperY = 6;
+		double lowerX = a, upperX = meanX +5 * sigmaX, lowerY = b, upperY = meanY + 5*sigmaY;
 		double dx = (upperX - lowerX) / stepsX;
 		double dy = (upperY - lowerY) / stepsY;
 

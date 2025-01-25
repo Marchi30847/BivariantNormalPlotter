@@ -4,9 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0e7a4028-e2ad-4466-8439-577fb55c38be" name="Changes" comment="fx finally configured correctly">
+    <list default="true" id="0e7a4028-e2ad-4466-8439-577fb55c38be" name="Changes" comment="problem with gui3d">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/deep/BivariateNormalLogic.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/deep/BivariateNormalLogic.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/deep/Gui3d.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/deep/Gui3d.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/deep/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/deep/Main.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,38 +53,38 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.BivariateNormal3DPlotFX.executor": "Run",
-    "Application.BivariateNormal3DPlotJavaFX.executor": "Run",
-    "Application.BivariateNormalConditionalProbability.executor": "Run",
-    "Application.BivariateNormalGUI.executor": "Run",
-    "Application.BivariateNormalPlot.executor": "Run",
-    "Application.GUI3D.executor": "Run",
-    "Application.Gui3d.executor": "Run",
-    "Application.HeatmapPlot.executor": "Run",
-    "Application.Main.executor": "Run",
-    "Application.SimplePlot.executor": "Run",
-    "Downloaded.Files.Path.Enabled": "false",
-    "Repository.Attach.Annotations": "false",
-    "Repository.Attach.JavaDocs": "false",
-    "Repository.Attach.Sources": "false",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "Konrad's-version",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "reference.settings.project.maven.repository.indices",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.BivariateNormal3DPlotFX.executor&quot;: &quot;Run&quot;,
+    &quot;Application.BivariateNormal3DPlotJavaFX.executor&quot;: &quot;Run&quot;,
+    &quot;Application.BivariateNormalConditionalProbability.executor&quot;: &quot;Run&quot;,
+    &quot;Application.BivariateNormalGUI.executor&quot;: &quot;Run&quot;,
+    &quot;Application.BivariateNormalPlot.executor&quot;: &quot;Run&quot;,
+    &quot;Application.GUI3D.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Gui3d.executor&quot;: &quot;Run&quot;,
+    &quot;Application.HeatmapPlot.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Application.SimplePlot.executor&quot;: &quot;Run&quot;,
+    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Konrad's-version&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.repository.indices&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Application.Main">
     <configuration name="BivariateNormalGUI" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="deep.BivariateNormalGUI" />
@@ -121,8 +124,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Application.Main" />
-        <item itemvalue="Application.Gui3d" />
         <item itemvalue="Application.BivariateNormalGUI" />
+        <item itemvalue="Application.Gui3d" />
         <item itemvalue="Application.SimplePlot" />
         <item itemvalue="Application.GUI3D" />
       </list>
@@ -131,8 +134,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-125ca727e0f0-intellij.indexing.shared.core-IU-243.23654.117" />
-        <option value="bundled-js-predefined-d6986cc7102b-822845ee3bb5-JavaScript-IU-243.23654.117" />
+        <option value="bundled-jdk-9823dce3aa75-125ca727e0f0-intellij.indexing.shared.core-IU-243.23654.153" />
+        <option value="bundled-js-predefined-d6986cc7102b-822845ee3bb5-JavaScript-IU-243.23654.153" />
       </set>
     </attachedChunks>
   </component>
@@ -148,7 +151,10 @@
       <workItem from="1737653485323" duration="5193000" />
       <workItem from="1737716091968" duration="4441000" />
       <workItem from="1737720780730" duration="1553000" />
-      <workItem from="1737727572049" duration="5505000" />
+      <workItem from="1737727572049" duration="5564000" />
+      <workItem from="1737823615168" duration="5843000" />
+      <workItem from="1737829477109" duration="24000" />
+      <workItem from="1737829700039" duration="113000" />
     </task>
     <task id="LOCAL-00001" summary="Initial">
       <option name="closed" value="true" />
@@ -214,7 +220,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737729780515</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="problem with gui3d">
+      <option name="closed" value="true" />
+      <created>1737733091075</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1737733091075</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -228,6 +242,7 @@
     <MESSAGE value="implementation of gui" />
     <MESSAGE value="last change for gui" />
     <MESSAGE value="fx finally configured correctly" />
-    <option name="LAST_COMMIT_MESSAGE" value="fx finally configured correctly" />
+    <MESSAGE value="problem with gui3d" />
+    <option name="LAST_COMMIT_MESSAGE" value="problem with gui3d" />
   </component>
 </project>
