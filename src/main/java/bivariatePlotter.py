@@ -4,8 +4,10 @@ from mpl_toolkits.mplot3d import Axes3D
 import sys
 import math
 
-if len(sys.argv) != 8:
-    print("Usage: [x_mean] [x_stddev] [y_mean] [y_stddev] [corr] [a] [b]")
+if len(sys.argv) < 8 or len(sys.argv) > 10:
+    print("Usage: (x_mean) (x_stddev) (y_mean) (y_stddev) (corr) (a) (b) [range_factor] [steps]")
+    print("  [range_factor] - optional - defines how far away to integrate and draw the graph from the x and y means. By default it is set to 5 * x_stddev or 5 * y_stddev, whichever is larger.")
+    print("  [steps] - optional - number of steps used for numerical integration. The default value is 3000.")
     sys.exit(1)
 
 x_mean = float(sys.argv[1])
@@ -15,6 +17,23 @@ y_stddev = float(sys.argv[4])
 corr = float(sys.argv[5])
 a_input = float(sys.argv[6])
 b_input = float(sys.argv[7])
+
+range_factor = max(5.0*x_stddev, 5.0*y_stddev)
+steps = 3000
+
+if len(sys.argv) > 8:
+    range_factor = int(sys.argv[8])
+
+if len(sys.argv) > 9:
+    steps = int(sys.argv[9])
+
+if x_stddev <= 0 or y_stddev <= 0:
+    print("The x and y standard deviations cannot be negative or zero.")
+    incorrectArguments()
+
+if not -1 <= corr <= 1:
+    print("Correlation coefficient must be between -1 and 1.")
+    incorrectArguments()
 
 def pdfBivariateNormalDist(x, y):
     """
@@ -36,138 +55,109 @@ def pdfBivariateNormalDist(x, y):
 
 	Source: https://webspace.maths.qmul.ac.uk/a.gnedin/LNotesStats/MS_Lectures_5.pdf
     """
-    # Check the correlation is in valid range
-    if not -1 <= corr <= 1:
-        raise ValueError("Correlation coefficient must be between -1 and 1.")
-    
-    # Precompute constants
     two_pi = 2 * math.pi
     rho_squared = corr ** 2
     denom = 2 * (1 - rho_squared)
 
-    # Normalizing constant for the bivariate distribution
     normalization = 1.0 / (two_pi * x_stddev * y_stddev * math.sqrt(1 - rho_squared))
 
-    # Compute the exponent
     x_term = (x - x_mean) / x_stddev
     y_term = (y - y_mean) / y_stddev
     exponent = -1.0 / denom * (x_term**2 + y_term**2 - 2 * corr * x_term * y_term)
 
-    # Return the PDF value
     return normalization * math.exp(exponent)
 
-def P_X_greater_a_Y_greater_b(a, b, steps=200, range_factor=5.0):
+# Define integration limits based on standard deviations
+#x_min = x_mean - range_factor * x_stddev
+#x_max = x_mean + range_factor * x_stddev
+#y_min = y_mean - range_factor * y_stddev
+#y_max = y_mean + range_factor * y_stddev
+x_min = x_mean - range_factor
+x_max = x_mean + range_factor
+y_min = y_mean - range_factor
+y_max = y_mean + range_factor
+
+# Create a dense grid
+x_values = np.linspace(x_min, x_max, steps)
+y_values = np.linspace(y_min, y_max, steps)
+dx = x_values[1] - x_values[0]
+dy = y_values[1] - y_values[0]
+
+# Create meshgrid
+X, Y = np.meshgrid(x_values, y_values)
+
+# Compute the PDF over the grid
+# Vectorize the PDF function for efficiency
+vectorized_pdf = np.vectorize(pdfBivariateNormalDist)
+Z = vectorized_pdf(X, Y)
+
+# Compute P(Y > y) as a 1D array
+# Sum over x for each y, then cumulative sum over y in descending order
+sum_over_x = np.sum(Z, axis=1)  # Shape: (steps,)
+cumsum_rev_y = np.cumsum(sum_over_x[::-1]) * dx  # Cumulative sum from y_max downward
+P_Y_gt = cumsum_rev_y[::-1] * dy  # Reverse back to original order
+
+# Compute P(X > x, Y > y) as a 2D array
+# Perform 2D cumulative sum from bottom-right to top-left
+Z_rev = Z[::-1, ::-1]
+cumsum_x_rev = np.cumsum(np.cumsum(Z_rev, axis=0), axis=1) * dx * dy
+P_X_gt_X_Y_gt_Y = cumsum_x_rev[::-1, ::-1]
+
+# Ensure probabilities do not exceed 1 due to numerical errors
+P_Y_gt = np.minimum(P_Y_gt, 1.0)
+P_X_gt_X_Y_gt_Y = np.minimum(P_X_gt_X_Y_gt_Y, 1.0)
+
+# Compute the conditional probability P(X > x | Y > y)
+conditional_prob = np.where(P_Y_gt[:, np.newaxis] > 0,
+                            P_X_gt_X_Y_gt_Y / P_Y_gt[:, np.newaxis],
+                            np.nan)
+conditional_prob = np.minimum(conditional_prob, 1.0)  # Cap at 1.0
+
+def get_conditional_prob(a, b):
     """
-    Numerically approximates P(X > a, Y > b) by summing over a grid.
-    We integrate over x in [a, x_max], y in [b, y_max], where
-    x_max = x_mean + range_factor * x_stddev,
-    y_max = y_mean + range_factor * y_stddev.
-
-    The 'steps' parameter controls the resolution of the grid.
+    Retrieves the conditional probability P(X > a | Y > b) using precomputed arrays.
     """
-    # Define the upper integration limits (finite approximation)
-    x_max = x_mean + range_factor * x_stddev
-    y_max = y_mean + range_factor * y_stddev
+    # Find the index for a and b
+    ix = np.searchsorted(x_values, a, side='left')
+    iy = np.searchsorted(y_values, b, side='left')
 
-    # If a is greater than x_max (or b is greater than y_max), prob is effectively 0
-    if a >= x_max or b >= y_max:
-        return 0.0
-
-    # Create linearly spaced grids for x and y
-    x_grid = np.linspace(a, x_max, steps)
-    y_grid = np.linspace(b, y_max, steps)
-
-    dx = (x_max - a) / (steps - 1)
-    dy = (y_max - b) / (steps - 1)
-
-    # Double sum to approximate the integral
-    total = 0.0
-    for i in range(steps):
-        for j in range(steps):
-            x_val = x_grid[i]
-            y_val = y_grid[j]
-            total += pdfBivariateNormalDist(x_val, y_val) * dx * dy
-
-    if total >= 1.0:
-        return 1.0
-
-    return total
-
-def P_Y_greater_b(b, steps=200, range_factor=5.0):
-    """
-    Numerically approximates P(Y > b) by summing over a grid.
-    We integrate over x in [x_min, x_max], y in [b, y_max], where
-    x_min = x_mean - range_factor * x_stddev,
-    x_max = x_mean + range_factor * x_stddev,
-    y_max = y_mean + range_factor * y_stddev.
-    """
-    # Define the integration limits (finite approximation)
-    x_min = x_mean - range_factor * x_stddev
-    x_max = x_mean + range_factor * x_stddev
-    y_max = y_mean + range_factor * y_stddev
-
-    # If b >= y_max, prob is effectively 0
-    if b >= y_max:
-        return 0.0
-
-    # Create linearly spaced grids for x and y
-    x_grid = np.linspace(x_min, x_max, steps)
-    y_grid = np.linspace(b, y_max, steps)
-
-    dx = (x_max - x_min) / (steps - 1)
-    dy = (y_max - b) / (steps - 1)
-
-    total = 0.0
-    for i in range(steps):
-        for j in range(steps):
-            x_val = x_grid[i]
-            y_val = y_grid[j]
-            total += pdfBivariateNormalDist(x_val, y_val) * dx * dy
-
-    if total >= 1.0:
-        return 1.0
-
-    return total
-
-def conditional_P_X_greater_a_given_Y_greater_b(a, b, steps=50, range_factor=5.0):
-    """
-    Calculates P(X > a | Y > b) = P(X > a, Y > b) / P(Y > b)
-    using simple numerical approximation with two nested loops.
-    """
-    numerator = P_X_greater_a_Y_greater_b(a, b, steps, range_factor)
-    denominator = P_Y_greater_b(b, steps, range_factor)
-
-    if denominator == 0:
+    if ix >= steps or iy >= steps:
+        # P(Y > y) = 0.0 => probability couldn't be calculated
         return float('nan')
-    value = numerator / denominator
-    if value >= 1.0:
-        return 1.0
-    return value
 
-prob = conditional_P_X_greater_a_given_Y_greater_b(a_input, b_input)
-print("P( X > a | Y > b ) = P( X >", a_input, "| Y >", b_input, ") =", prob)
+    # Ensure indices are within bounds
+    ix = min(ix, steps - 1)
+    iy = min(iy, steps - 1)
 
-# Generate x and y values
-x = np.linspace(x_mean - 5, x_mean + 5, 20)
-y = np.linspace(y_mean - 5, y_mean + 5, 20)
-x, y = np.meshgrid(x, y)  # Create a 2D grid
+    prob = conditional_prob[iy, ix]
+    return prob
 
-# Compute z values
-vectorized_function = np.vectorize(conditional_P_X_greater_a_given_Y_greater_b)
-z = vectorized_function(x, y)
+# Compute the probability for the input a and b
+prob = get_conditional_prob(a_input, b_input)
+print(f"P(X > {a_input} | Y > {b_input}) = {prob}")
+
+# Generate x and y values for plotting
+plot_steps = 100
+plot_x = np.linspace(x_min, x_max, plot_steps)
+plot_y = np.linspace(y_min, y_max, plot_steps)
+plot_X, plot_Y = np.meshgrid(plot_x, plot_y)
+
+# Vectorize the get_conditional_prob function for plotting
+vectorized_get_conditional_prob = np.vectorize(get_conditional_prob)
+plot_Z = vectorized_get_conditional_prob(plot_X, plot_Y)
 
 # Create a 3D plot
 fig = plt.figure(figsize=(10, 8))
 ax = fig.add_subplot(111, projection='3d')
 
 # Plot the surface
-surface = ax.plot_surface(x, y, z, cmap='viridis', edgecolor='k', linewidth=0.5, antialiased=True)
+surface = ax.plot_surface(plot_X, plot_Y, plot_Z, cmap='viridis', edgecolor='k', linewidth=0.5, antialiased=True)
 
 # Add a color bar
-fig.colorbar(surface, ax=ax, shrink=0.5, aspect=10, label='P( X > x | Y > y )')
+fig.colorbar(surface, ax=ax, shrink=0.5, aspect=10, label='F(x, y) = P(X > x | Y > y)')
 
 # Add labels and title
-ax.set_title("3D Plot of P( X > x | Y > y )")
+ax.set_title("Plot of F(x, y) = P(X > x | Y > y)")
 ax.set_xlabel("X")
 ax.set_ylabel("Y")
 ax.set_zlabel("Probability")
