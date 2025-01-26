@@ -4,11 +4,15 @@ from mpl_toolkits.mplot3d import Axes3D
 import sys
 import math
 
-if len(sys.argv) < 8 or len(sys.argv) > 10:
+def incorrect_arguments():
     print("Usage: (x_mean) (x_stddev) (y_mean) (y_stddev) (corr) (a) (b) [range_factor] [steps]")
-    print("  [range_factor] - optional - defines how far away to integrate and draw the graph from the x and y means. By default it is set to 5 * x_stddev or 5 * y_stddev, whichever is larger.")
+    print("  [range_factor] - optional - defines how far away to integrate and draw the graph from the x and y means.")
+    print("    By default it is set to 5 * x_stddev or 5 * y_stddev, whichever is larger.")
     print("  [steps] - optional - number of steps used for numerical integration. The default value is 3000.")
     sys.exit(1)
+
+if len(sys.argv) < 8 or len(sys.argv) > 10:
+    incorrect_arguments()
 
 x_mean = float(sys.argv[1])
 x_stddev = float(sys.argv[2])
@@ -29,13 +33,13 @@ if len(sys.argv) > 9:
 
 if x_stddev <= 0 or y_stddev <= 0:
     print("The x and y standard deviations cannot be negative or zero.")
-    incorrectArguments()
+    incorrect_arguments()
 
-if not -1 <= corr <= 1:
-    print("Correlation coefficient must be between -1 and 1.")
-    incorrectArguments()
+if not -1 < corr < 1:
+    print("Correlation coefficient must be between (-1, 1) - not including {-1, 1}.")
+    incorrect_arguments()
 
-def pdfBivariateNormalDist(x, y):
+def pdf_bivariate_normal_dist(x, y):
     """
     Returns the value of the PDF (Probability Density Function) for the
     Bivariate Normal distribution at the point (x, y) for the given:
@@ -67,11 +71,7 @@ def pdfBivariateNormalDist(x, y):
 
     return normalization * math.exp(exponent)
 
-# Define integration limits based on standard deviations
-#x_min = x_mean - range_factor * x_stddev
-#x_max = x_mean + range_factor * x_stddev
-#y_min = y_mean - range_factor * y_stddev
-#y_max = y_mean + range_factor * y_stddev
+# Define integration limits
 x_min = x_mean - range_factor
 x_max = x_mean + range_factor
 y_min = y_mean - range_factor
@@ -87,8 +87,7 @@ dy = y_values[1] - y_values[0]
 X, Y = np.meshgrid(x_values, y_values)
 
 # Compute the PDF over the grid
-# Vectorize the PDF function for efficiency
-vectorized_pdf = np.vectorize(pdfBivariateNormalDist)
+vectorized_pdf = np.vectorize(pdf_bivariate_normal_dist)
 Z = vectorized_pdf(X, Y)
 
 # Compute P(Y > y) as a 1D array
